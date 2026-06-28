@@ -1,0 +1,19 @@
+* Pass Through
+
+** PNG
+#+begin_src eqn :file pythagoras.png
+  x sup 2 + y sup 2 = z sup 2
+#+end_src
+
+#+RESULTS:
+[[file:pythagoras.png]]
+
+
+** PDF
+#+begin_src eqn :file pythagoras.pdf
+  x sup 2 + y sup 2 = z sup 2
+#+end_src
+
+#+RESULTS:
+[[file:pythagoras.pdf]]
+
