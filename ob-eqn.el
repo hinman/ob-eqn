@@ -33,7 +33,7 @@
 ;;
 ;; - The groff -ms macro package is used by default for proper
 ;;   display-equation centering and spacing.  Override with
-;;   `org-babel-eqn-groff-ms-args'.
+;;   `ob-eqn-groff-ms-args'.
 ;;
 ;; Pipeline:
 ;;
@@ -74,35 +74,35 @@
     (:file-ext . "png"))
   "Default header arguments for eqn source blocks.")
 
-(defcustom org-babel-eqn-groff-cmd "groff"
+(defcustom ob-eqn-groff-cmd "groff"
   "Path to the groff executable."
   :group 'ob-eqn
   :type 'string
   :risky t)
 
-(defcustom org-babel-eqn-groff-ms-args "-ms"
+(defcustom ob-eqn-groff-ms-args "-ms"
   "Groff macro package argument passed to every invocation.
 Common values: \"-ms\" (default), \"-me\", \"-mom\", or \"\" for none."
   :group 'ob-eqn
   :type 'string)
 
-(defcustom org-babel-eqn-gs-cmd "gs"
+(defcustom ob-eqn-gs-cmd "gs"
   "Path to the Ghostscript executable, used for PNG output."
   :group 'ob-eqn
   :type 'string
   :risky t)
 
-(defcustom org-babel-eqn-png-dpi 150
+(defcustom ob-eqn-png-dpi 150
   "Resolution in dots per inch for PNG output."
   :group 'ob-eqn
   :type 'integer)
 
-(defcustom org-babel-eqn-png-padding 6
+(defcustom ob-eqn-png-padding 6
   "Padding in points added on each side of the bounding box for PNG output."
   :group 'ob-eqn
   :type 'integer)
 
-(defcustom org-babel-eqn-preamble ""
+(defcustom ob-eqn-preamble ""
   "Groff/troff commands inserted at the top of every eqn document.
 Use this to set registers such as \".nr PS 12\" or override -ms defaults.
 The preamble is placed before the .EQ block (or before the user body
@@ -117,7 +117,7 @@ when pass-through mode is active)."
 If BODY already begins with a .EQ line (possibly preceded by whitespace),
 it is used as-is (pass-through mode) so the user can supply custom eqn
 delimiters or inline equations.  Otherwise BODY is wrapped in .EQ / .EN.
-In both cases `org-babel-eqn-preamble' is prepended, and the :prologue
+In both cases `ob-eqn-preamble' is prepended, and the :prologue
 and :epilogue header arguments are applied."
   (let ((prologue (cdr (assq :prologue params)))
         (epilogue (cdr (assq :epilogue params)))
@@ -127,8 +127,8 @@ and :epilogue header arguments are applied."
            (concat ".EQ\n" body "\n.EN"))))
     (concat
      (and prologue (concat prologue "\n"))
-     (and (not (string-empty-p org-babel-eqn-preamble))
-          (concat org-babel-eqn-preamble "\n"))
+     (and (not (string-empty-p ob-eqn-preamble))
+          (concat ob-eqn-preamble "\n"))
      inner
      (and epilogue (concat "\n" epilogue)))))
 
@@ -141,7 +141,7 @@ Uses Ghostscript's bbox device.  The values are floats taken from the
 2>&1).  Returns nil when no renderable content is detected."
   (let ((out (shell-command-to-string
               (format "%s -sDEVICE=bbox -dBATCH -dNOPAUSE -dSAFER -q %s 2>&1"
-                      org-babel-eqn-gs-cmd
+                      ob-eqn-gs-cmd
                       (shell-quote-argument ps-file)))))
     (when (string-match
            "%%HiResBoundingBox: \
@@ -171,7 +171,7 @@ groff output (check your eqn syntax)")))
 -sOutputFile=%s \
 -c \"<< /BeginPage { pop %g %g translate } bind >> setpagedevice\" \
 -f %s"
-      org-babel-eqn-gs-cmd dpi W H
+      ob-eqn-gs-cmd dpi W H
       (shell-quote-argument out-file)
       TX TY
       (shell-quote-argument ps-file)))))
@@ -187,8 +187,8 @@ This function is called by `org-babel-execute-src-block'."
          (cmdline  (or (cdr (assq :cmdline params)) ""))
          (in-file  (org-babel-temp-file "eqn-"))
          (groff-base (string-join
-                      (delete "" (list org-babel-eqn-groff-cmd
-                                       org-babel-eqn-groff-ms-args
+                      (delete "" (list ob-eqn-groff-cmd
+                                       ob-eqn-groff-ms-args
                                        "-e"
                                        cmdline))
                       " ")))
@@ -215,8 +215,8 @@ This function is called by `org-babel-execute-src-block'."
                   (shell-quote-argument in-file)
                   (shell-quote-argument ps-tmp)))
          (ob-eqn--ps-to-png ps-tmp out-file
-                             org-babel-eqn-png-dpi
-                             org-babel-eqn-png-padding)))
+                             ob-eqn-png-dpi
+                             ob-eqn-png-padding)))
       (_
        (error "ob-eqn: unsupported output format %S (use png, pdf, or ps)"
               ext)))

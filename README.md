@@ -79,23 +79,23 @@ All options belong to the `ob-eqn` customization group (`M-x customize-group RET
 
 | Variable | Default | Description |
 |---|---|---|
-| `org-babel-eqn-groff-cmd` | `"groff"` | Path to the groff executable |
-| `org-babel-eqn-groff-ms-args` | `"-ms"` | Groff macro package (`-ms`, `-me`, `-mom`, or `""`) |
-| `org-babel-eqn-gs-cmd` | `"gs"` | Path to the Ghostscript executable |
-| `org-babel-eqn-png-dpi` | `150` | PNG output resolution in dots per inch |
-| `org-babel-eqn-png-padding` | `6` | Padding in points added around the PNG bounding box |
-| `org-babel-eqn-preamble` | `""` | groff/troff commands inserted at the top of every document |
+| `ob-eqn-groff-cmd` | `"groff"` | Path to the groff executable |
+| `ob-eqn-groff-ms-args` | `"-ms"` | Groff macro package (`-ms`, `-me`, `-mom`, or `""`) |
+| `ob-eqn-gs-cmd` | `"gs"` | Path to the Ghostscript executable |
+| `ob-eqn-png-dpi` | `150` | PNG output resolution in dots per inch |
+| `ob-eqn-png-padding` | `6` | Padding in points added around the PNG bounding box |
+| `ob-eqn-preamble` | `""` | groff/troff commands inserted at the top of every document |
 
 ### Example: increase PNG resolution
 
 ```emacs-lisp
-(setq org-babel-eqn-png-dpi 300)
+(setq ob-eqn-png-dpi 300)
 ```
 
 ### Example: add a preamble to set the point size
 
 ```emacs-lisp
-(setq org-babel-eqn-preamble ".nr PS 14")
+(setq ob-eqn-preamble ".nr PS 14")
 ```
 
 ## How it works

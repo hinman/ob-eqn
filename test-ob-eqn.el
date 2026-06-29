@@ -73,12 +73,12 @@
 
 (ert-deftest ob-eqn/customvars-bound ()
   "All defcustoms are bound after loading."
-  (should (boundp 'org-babel-eqn-groff-cmd))
-  (should (boundp 'org-babel-eqn-groff-ms-args))
-  (should (boundp 'org-babel-eqn-gs-cmd))
-  (should (boundp 'org-babel-eqn-png-dpi))
-  (should (boundp 'org-babel-eqn-png-padding))
-  (should (boundp 'org-babel-eqn-preamble)))
+  (should (boundp 'ob-eqn-groff-cmd))
+  (should (boundp 'ob-eqn-groff-ms-args))
+  (should (boundp 'ob-eqn-gs-cmd))
+  (should (boundp 'ob-eqn-png-dpi))
+  (should (boundp 'ob-eqn-png-padding))
+  (should (boundp 'ob-eqn-preamble)))
 
 (ert-deftest ob-eqn/no-sessions ()
   "`org-babel-prep-session:eqn' signals an error."
@@ -88,7 +88,7 @@
 
 (ert-deftest ob-eqn/expand-body-auto-wrap ()
   "Plain body is wrapped in .EQ / .EN."
-  (let ((org-babel-eqn-preamble ""))
+  (let ((ob-eqn-preamble ""))
     (let ((result (org-babel-expand-body:eqn "x sup 2" '())))
       (should (string-match-p "\\.EQ" result))
       (should (string-match-p "\\.EN" result))
@@ -96,7 +96,7 @@
 
 (ert-deftest ob-eqn/expand-body-auto-wrap-order ()
   ".EQ precedes body which precedes .EN."
-  (let ((org-babel-eqn-preamble ""))
+  (let ((ob-eqn-preamble ""))
     (let ((result (org-babel-expand-body:eqn "x sup 2" '())))
       (should (< (string-match "\\.EQ" result)
                  (string-match "x sup 2" result)))
@@ -105,7 +105,7 @@
 
 (ert-deftest ob-eqn/expand-body-passthrough-dotEQ ()
   "Body starting with .EQ is not double-wrapped."
-  (let ((org-babel-eqn-preamble ""))
+  (let ((ob-eqn-preamble ""))
     (let ((result (org-babel-expand-body:eqn ".EQ\nx sup 2\n.EN" '())))
       ;; Should contain exactly one .EQ
       (should (= 1 (cl-count-if
@@ -120,21 +120,21 @@
 
 (ert-deftest ob-eqn/expand-body-passthrough-preserves-body ()
   "Pass-through body text is present unchanged in the output."
-  (let ((org-babel-eqn-preamble ""))
+  (let ((ob-eqn-preamble ""))
     (let* ((body ".EQ\nint from 0 to inf\n.EN")
            (result (org-babel-expand-body:eqn body '())))
       (should (string-match-p "int from 0 to inf" result)))))
 
 (ert-deftest ob-eqn/expand-body-passthrough-whitespace ()
   "Leading whitespace before .EQ is still detected as pass-through."
-  (let ((org-babel-eqn-preamble ""))
+  (let ((ob-eqn-preamble ""))
     (let ((result (org-babel-expand-body:eqn "  .EQ\nx\n.EN" '())))
       ;; Should not gain an extra .EQ wrapper
       (should-not (string-match-p "\\.EQ\n\\.EQ" result)))))
 
 (ert-deftest ob-eqn/expand-body-preamble-prepended ()
-  "`org-babel-eqn-preamble' appears before .EQ in the output."
-  (let ((org-babel-eqn-preamble ".nr PS 12"))
+  "`ob-eqn-preamble' appears before .EQ in the output."
+  (let ((ob-eqn-preamble ".nr PS 12"))
     (let ((result (org-babel-expand-body:eqn "x sup 2" '())))
       (should (string-match-p "\\.nr PS 12" result))
       (should (< (string-match "\\.nr PS 12" result)
@@ -142,13 +142,13 @@
 
 (ert-deftest ob-eqn/expand-body-empty-preamble ()
   "Empty preamble produces no stray blank line before .EQ."
-  (let ((org-babel-eqn-preamble ""))
+  (let ((ob-eqn-preamble ""))
     (let ((result (org-babel-expand-body:eqn "x" '())))
       (should (string-prefix-p ".EQ" result)))))
 
 (ert-deftest ob-eqn/expand-body-prologue ()
   ":prologue param is prepended before preamble."
-  (let ((org-babel-eqn-preamble ".nr PS 12"))
+  (let ((ob-eqn-preamble ".nr PS 12"))
     (let ((result (org-babel-expand-body:eqn
                    "x sup 2"
                    '((:prologue . ".nr PO 0.25i")))))
@@ -158,7 +158,7 @@
 
 (ert-deftest ob-eqn/expand-body-epilogue ()
   ":epilogue param is appended after .EN."
-  (let ((org-babel-eqn-preamble ""))
+  (let ((ob-eqn-preamble ""))
     (let ((result (org-babel-expand-body:eqn
                    "x sup 2"
                    '((:epilogue . ".bp")))))
@@ -288,8 +288,8 @@ Also stubs `org-babel-temp-file' to return predictable paths."
     (should (string-match-p "-rPS=14" (car cmds)))))
 
 (ert-deftest ob-eqn/execute-ms-args-in-cmd ()
-  "`org-babel-eqn-groff-ms-args' appears in the groff invocation."
-  (let ((org-babel-eqn-groff-ms-args "-me"))
+  "`ob-eqn-groff-ms-args' appears in the groff invocation."
+  (let ((ob-eqn-groff-ms-args "-me"))
     (let ((cmds (ob-eqn--with-mock-shell
                   (org-babel-execute:eqn "x" '((:file . "/out.pdf"))))))
       (should (string-match-p "-me" (car cmds))))))
@@ -323,7 +323,7 @@ Also stubs `org-babel-temp-file' to return predictable paths."
 (ert-deftest ob-eqn/groff-accepts-auto-wrapped-body ()
   "groff -ms -e -Tps accepts the output of `expand-body' for a plain body."
   (skip-unless (executable-find "groff"))
-  (let* ((org-babel-eqn-preamble "")
+  (let* ((ob-eqn-preamble "")
          (doc (org-babel-expand-body:eqn "x sup 2 + y sup 2 = z sup 2" '()))
          (in-file (make-temp-file "ob-eqn-test-" nil ".eqn"))
          (exit-code nil))
@@ -338,7 +338,7 @@ Also stubs `org-babel-temp-file' to return predictable paths."
 (ert-deftest ob-eqn/groff-accepts-passthrough-body ()
   "groff -ms -e -Tps accepts pass-through body (user supplies .EQ/.EN)."
   (skip-unless (executable-find "groff"))
-  (let* ((org-babel-eqn-preamble "")
+  (let* ((ob-eqn-preamble "")
          (body ".EQ\nint from 0 to inf e sup {-x sup 2} dx\n.EN")
          (doc (org-babel-expand-body:eqn body '()))
          (in-file (make-temp-file "ob-eqn-test-" nil ".eqn"))
