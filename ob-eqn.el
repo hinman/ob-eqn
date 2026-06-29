@@ -156,7 +156,7 @@ Uses Ghostscript's bbox device.  The values are floats taken from the
 DPI controls resolution; PADDING (in points) is added around the
 detected bounding box.  Signals an error if no content is found."
   (let* ((bbox (or (ob-eqn--gs-bbox ps-file)
-                   (error "ob-eqn: no renderable content detected in \
+                   (error "ob-eqn: No renderable content detected in \
 groff output (check your eqn syntax)")))
          (llx (nth 0 bbox)) (lly (nth 1 bbox))
          (urx (nth 2 bbox)) (ury (nth 3 bbox))
@@ -218,13 +218,13 @@ This function is called by `org-babel-execute-src-block'."
                              ob-eqn-png-dpi
                              ob-eqn-png-padding)))
       (_
-       (error "ob-eqn: unsupported output format %S (use png, pdf, or ps)"
+       (error "ob-eqn: Unsupported output format %S (use png, pdf, or ps)"
               ext)))
     nil))
 
 (defun org-babel-prep-session:eqn (_session _params)
   "Signal an error: eqn does not support interactive sessions."
-  (error "ob-eqn: eqn does not support sessions"))
+  (error "ob-eqn: Eqn does not support sessions"))
 
 (provide 'ob-eqn)
 
